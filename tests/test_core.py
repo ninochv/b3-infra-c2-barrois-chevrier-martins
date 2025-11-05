@@ -42,3 +42,13 @@ def test_consolidate_shopping_list():
     lookup = { (i["name"], i["unit"]): i["qty"] for i in items }
     assert lookup.get(("pâtes", "g")) == 200
     assert lookup.get(("riz", "g")) == 150
+
+def test_ellergens_handling():
+    from mealmaker.core import has_allergies
+    r1 = {"allergies": ["gluten", "lait"]}
+    r2 = {"allergies": ["oeufs"]}
+    r3 = {}
+    assert has_allergies(r1, ["gluten"]) is True
+    assert has_allergies(r1, ["oeufs"]) is False
+    assert has_allergies(r2, ["oeufs", "lait"]) is True
+    assert has_allergies(r3, ["gluten"]) is False
