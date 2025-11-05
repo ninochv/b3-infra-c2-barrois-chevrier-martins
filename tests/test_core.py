@@ -61,3 +61,18 @@ def test_ellergens_handling():
     assert has_allergies(r1, ["oeufs"]) is False
     assert has_allergies(r2, ["oeufs", "lait"]) is True
     assert has_allergies(r3, ["gluten"]) is False
+
+
+def test_select_menu_min_fish_max_meat():
+    recs = [
+        {"id": "f1", "name": "Poisson A", "tags": ["poisson"], "time_min": 20, "budget_eur": 3.0, "ingredients": []},
+        {"id": "f2", "name": "Poisson B", "tags": ["poisson"], "time_min": 15, "budget_eur": 2.5, "ingredients": []},
+        {"id": "m1", "name": "Viande A", "tags": ["viande"], "time_min": 30, "budget_eur": 4.0, "ingredients": []},
+        {"id": "v1", "name": "Vege A", "tags": ["vege"], "time_min": 10, "budget_eur": 1.5, "ingredients": []},
+    ]
+    from mealmaker.core import select_menu
+    menu = select_menu(recs, days=3, min_vege=1, min_fish=1, max_meat=1, seed=1)
+    fish_count = sum(1 for r in menu if "poisson" in [t.lower() for t in r.get("tags", [])])
+    meat_count = sum(1 for r in menu if "viande" in [t.lower() for t in r.get("tags", [])])
+    assert fish_count >= 1
+    assert meat_count <= 1
