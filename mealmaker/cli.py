@@ -12,6 +12,9 @@ def main():
     p.add_argument("--tolerance", type=float, default=0.2)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--output", default=None, help="Chemin pour sauvegarder le JSON")
+    p.add_argument("--no-duplicates", action="store_true", help="Éviter les doublons exacts de recettes dans la semaine")
+    p.add_argument("--min-fish", type=int, default=0, help="Nombre minimum de recettes avec le tag 'poisson'")
+    p.add_argument("--max-meat", type=int, default=None, help="Nombre maximum de recettes avec le tag 'viande' (None = pas de limite)")
 
     args = p.parse_args()
 
@@ -24,6 +27,9 @@ def main():
         avg_budget=args.avg_budget,
         tolerance=args.tolerance,
         seed=args.seed,
+        no_duplicates=args.no_duplicates,
+        min_fish=args.min_fish,
+        max_meat=args.max_meat,
     )
     save_json(result, args.output)
 
