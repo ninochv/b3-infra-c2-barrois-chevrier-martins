@@ -3,6 +3,7 @@
     "id": "r1",
     "name": "Pâtes à l'ail et huile d'olive",
     "tags": ["vege", "rapide", "budget"],
+    "allergies": ["gluten"],
     "time_min": 15,
     "budget_eur": 2.0,
     "ingredients": [
@@ -15,6 +16,7 @@
     "id": "r2",
     "name": "Omelette fromage",
     "tags": ["vege", "rapide"],
+    "allergies": ["oeufs", "lait"],
     "time_min": 10,
     "budget_eur": 1.8,
     "ingredients": [

@@ -51,3 +51,13 @@ def test_select_menu_no_duplicates():
     menu = select_menu(recs, days=5, no_duplicates=True, seed=1)
     ids = [r["id"] for r in menu]
     assert len(ids) == len(set(ids))  # pas de doublons
+    
+def test_ellergens_handling():
+    from mealmaker.core import has_allergies
+    r1 = {"allergies": ["gluten", "lait"]}
+    r2 = {"allergies": ["oeufs"]}
+    r3 = {}
+    assert has_allergies(r1, ["gluten"]) is True
+    assert has_allergies(r1, ["oeufs"]) is False
+    assert has_allergies(r2, ["oeufs", "lait"]) is True
+    assert has_allergies(r3, ["gluten"]) is False

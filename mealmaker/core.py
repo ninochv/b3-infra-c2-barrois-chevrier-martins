@@ -5,6 +5,15 @@ import random
 def is_vege(recipe: Dict[str, Any]) -> bool:
     return "tags" in recipe and any(t.lower() == "vege" for t in recipe["tags"])
 
+def has_allergies(recipe: Dict[str, Any], allergies: List[str]) -> bool:
+    if "allergies" not in recipe:
+        return False
+    recipe_allergies = set(a.lower() for a in recipe["allergies"])
+    for allergy in allergies:
+        if allergy.lower() in recipe_allergies:
+            return True
+    return False
+
 def fits_time(recipe: Dict[str, Any], max_time: int | None) -> bool:
     if max_time is None:
         return True
