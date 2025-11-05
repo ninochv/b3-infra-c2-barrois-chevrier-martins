@@ -33,6 +33,7 @@ def select_menu(
     avg_budget: float | None = None,
     tolerance: float = 0.2,
     seed: int | None = 42,
+    no_duplicates: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Sélection simple et déterministe (via seed) :
@@ -56,11 +57,18 @@ def select_menu(
             continue
         if avg_budget is not None and not within_budget_avg(cand, avg_budget, tolerance):
             continue
+        if no_duplicates and len({r["id"] for r in cand}) < len(cand):
+            continue  # il y a des doublons, on rejette ce tirage
         best = cand
         break
     if not best:
-        # Dernier recours: prendre les premiers qui passent le temps
-        best = pool[:days] if len(pool) >= days else (pool + pool)[:days]
+        # Si on veut pas de doublons, ne pas recréer des doublons artificiellement.
+        # Retourner simplement les recettes uniques disponibles (même si < days).
+        if no_duplicates:
+            pool_unique = list({r["id"]: r for r in pool}.values())
+            best = pool_unique[:days] if len(pool_unique) >= days else pool_unique
+        else:
+            best = pool[:days] if len(pool) >= days else (pool + pool)[:days]
     return best
 
 def consolidate_shopping_list(menu: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -86,10 +94,11 @@ def plan_menu(
     avg_budget: float | None = None,
     tolerance: float = 0.2,
     seed: int | None = 42,
+    no_duplicates: bool = False,
 ) -> Dict[str, Any]:
     menu = select_menu(
         recipes, days=days, min_vege=min_vege, max_time=max_time,
-        avg_budget=avg_budget, tolerance=tolerance, seed=seed
+        avg_budget=avg_budget, tolerance=tolerance, seed=seed, no_duplicates=no_duplicates,
     )
     shopping = consolidate_shopping_list(menu)
     return {"days": days, "menu": menu, "shopping_list": shopping}
