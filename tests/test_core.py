@@ -42,3 +42,12 @@ def test_consolidate_shopping_list():
     lookup = { (i["name"], i["unit"]): i["qty"] for i in items }
     assert lookup.get(("pâtes", "g")) == 200
     assert lookup.get(("riz", "g")) == 150
+
+def test_select_menu_no_duplicates():
+    recs = [
+        {"id": "a", "name": "A", "tags": ["vege"], "time_min": 10, "budget_eur": 2, "ingredients": []},
+        {"id": "b", "name": "B", "tags": ["viande"], "time_min": 15, "budget_eur": 3, "ingredients": []},
+    ]
+    menu = select_menu(recs, days=5, no_duplicates=True, seed=1)
+    ids = [r["id"] for r in menu]
+    assert len(ids) == len(set(ids))  # pas de doublons
