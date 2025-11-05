@@ -5,6 +5,11 @@ import random
 def is_vege(recipe: Dict[str, Any]) -> bool:
     return "tags" in recipe and any(t.lower() == "vege" for t in recipe["tags"])
 
+
+def has_tag(recipe: Dict[str, Any], tag: str) -> bool:
+    """Retourne True si la recette contient le tag (cas-insensible)."""
+    return "tags" in recipe and any(t.lower() == tag.lower() for t in recipe["tags"])
+
 def has_allergies(recipe: Dict[str, Any], allergies: List[str]) -> bool:
     if "allergies" not in recipe:
         return False
@@ -34,6 +39,8 @@ def select_menu(
     tolerance: float = 0.2,
     seed: int | None = 42,
     no_duplicates: bool = False,
+    min_fish: int = 0,
+    max_meat: int | None = None,
 ) -> List[Dict[str, Any]]:
     """
     Sélection simple et déterministe (via seed) :
@@ -53,7 +60,14 @@ def select_menu(
             cand.append(random.choice(pool))
         # Contraintes
         vege_count = sum(1 for r in cand if is_vege(r))
+        fish_count = sum(1 for r in cand if has_tag(r, "poisson"))
+        meat_count = sum(1 for r in cand if has_tag(r, "viande"))
+
         if vege_count < min_vege:
+            continue
+        if min_fish and fish_count < min_fish:
+            continue
+        if max_meat is not None and meat_count > max_meat:
             continue
         if avg_budget is not None and not within_budget_avg(cand, avg_budget, tolerance):
             continue
@@ -95,10 +109,13 @@ def plan_menu(
     tolerance: float = 0.2,
     seed: int | None = 42,
     no_duplicates: bool = False,
+    min_fish: int = 0,
+    max_meat: int | None = None,
 ) -> Dict[str, Any]:
     menu = select_menu(
         recipes, days=days, min_vege=min_vege, max_time=max_time,
         avg_budget=avg_budget, tolerance=tolerance, seed=seed, no_duplicates=no_duplicates,
+        min_fish=min_fish, max_meat=max_meat,
     )
     shopping = consolidate_shopping_list(menu)
     return {"days": days, "menu": menu, "shopping_list": shopping}
